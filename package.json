@@ -1,0 +1,22 @@
+{
+  "name": "react-knight",
+  "version": "1.0.0",
+  "description": "ReactKnight: A CLI tool to bootstrap React projects with customizable options.",
+  "author": "Hakim Tarbet Angri <ha.tarbet@gmail.com>",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "bin": {
+    "reactknight": "./dist/index.js"
+  },
+  "dependencies": {
+    "execa": "^9.5.1",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^12.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.9.1"
+  }
+}
