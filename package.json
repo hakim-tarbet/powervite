@@ -1,14 +1,16 @@
 {
-  "name": "react-knight",
+  "name": "powervite",
   "version": "1.0.0",
-  "description": "ReactKnight: A CLI tool to bootstrap React projects with customizable options.",
+  "description": "PowerVite: A CLI tool to bootstrap Vite js projects with customizable options.",
   "author": "Hakim Tarbet Angri <ha.tarbet@gmail.com>",
   "main": "dist/index.js",
   "license": "MIT",
+  "type": "module",
   "bin": {
-    "reactknight": "./dist/index.js"
+    "powervite": "./dist/index.js"
   },
   "dependencies": {
+    "@esbuild-kit/esm-loader": "^2.6.5",
     "execa": "^9.5.1",
     "fs-extra": "^11.2.0",
     "inquirer": "^12.1.0",
@@ -17,6 +19,23 @@
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.7",
-    "@types/node": "^22.9.1"
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^9.15.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
+  },
+  "scripts": {
+    "build": "npx tsc",
+    "chmod-exec": "chmod +x dist/index.js",
+    "prepare": "npm run  build && npm run chmod-exec",
+    "start": "node dist/index.js",
+    "dev": "node --no-warnings --loader @esbuild-kit/esm-loader src/index.ts",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   }
 }
