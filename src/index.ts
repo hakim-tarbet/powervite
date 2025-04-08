@@ -42,6 +42,4 @@ export async function PowerVite() {
   }
 }
 
-if (require.main === module) {
-  PowerVite();
-}
+PowerVite();

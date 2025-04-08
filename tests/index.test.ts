@@ -31,7 +31,19 @@ describe('PowerVite CLI', () => {
   describe('Command parser', () => {
     beforeEach(() => {
       jest.resetModules();
-      process.argv = ['node', 'script.js'];
+
+      questionsSpy.mockResolvedValue({
+        language: 'TypeScript',
+      });
+    });
+
+    it('should create a project when command is "init"', async () => {
+      process.argv = ['node', 'script.js', 'init', 'cli-project'];
+  
+      await PowerVite();
+  
+      expect(createViteProjectSpy).toHaveBeenCalledTimes(1);
+      expect(createViteProjectSpy).toHaveBeenCalledWith('cli-project', 'react-ts');
     });
 
     it('should return "Command not valid" error if command is not soported', async () => {
