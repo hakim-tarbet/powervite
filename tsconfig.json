@@ -3,15 +3,16 @@
     "baseUrl": ".",
     "paths": {
       "@cli/*": ["src/cli/*"],
+      "@vite/*": ["src/vite/*"],
     },
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "module": "ESNext",
     "moduleResolution": "Node",
     "target": "ES2021",
     "lib": ["ES2021"],
     "esModuleInterop": true,
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }

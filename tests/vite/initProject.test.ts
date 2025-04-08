@@ -1,4 +1,4 @@
-import { createViteProject } from '@cli/setup';
+import { initProject } from '@vite/initProject';
 import { execa } from 'execa';
 
 // Mock execa
@@ -6,11 +6,11 @@ jest.mock('execa', () => ({
   execa: jest.fn(),
 }));
 
-describe('CLI Setup', () => {
+describe('Vite init project', () => {
   it('should create a project using execa', async () => {
     (execa as jest.Mock).mockResolvedValue({});
 
-    await createViteProject('test-project', 'react-ts');
+    await initProject('test-project', 'react-ts');
 
     expect(execa).toHaveBeenCalledWith('npm', [
       'create',
@@ -25,6 +25,6 @@ describe('CLI Setup', () => {
   it('should throw an error if project creation fails', async () => {
     (execa as jest.Mock).mockRejectedValue(new Error('Failed'));
 
-    await expect(createViteProject('test-project', 'react-ts')).rejects.toThrow('Failed');
+    await expect(initProject('test-project', 'react-ts')).rejects.toThrow('Failed');
   });
 });

@@ -15,7 +15,7 @@
     "fs-extra": "^11.2.0",
     "inquirer": "^12.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.0"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.7",

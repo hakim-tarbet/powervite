@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 
-import { questions } from '@cli/inputs';
-import { createViteProject } from '@cli/setup';
+import { askUserChoices } from '@cli/prompts';
+import { initProject } from '@vite/initProject';
 
 export async function PowerViteInitProject(name?: string) {
   console.log('Welcome to PowerVite! Let’s bootstrap your project.');
   
   // Questions about project
   const projectName = typeof name === 'undefined' ? 'my-app' : name;
-  const { language } = await questions();
+  const { language } = await askUserChoices();
   const template = language === 'TypeScript' ? 'react-ts' : 'react';
 
   // Create project
   try {
     console.log(`Creating your react project named '${projectName}' in '${language}'...`);
     
-    await createViteProject(projectName, template);
+    await initProject(projectName, template);
 
     console.log(`Project '${projectName}' created successfully!`);
     console.log('Next steps:');

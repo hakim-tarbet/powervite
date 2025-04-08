@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
 
-export async function questions() {
+export async function askUserChoices() {
   return inquirer.prompt([{
     type: 'list',
     name: 'language',

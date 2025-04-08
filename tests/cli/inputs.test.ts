@@ -1,4 +1,4 @@
-import { questions } from '@cli/inputs';
+import { askUserChoices } from '@cli/prompts';
 import inquirer from 'inquirer';
 
 // Mock inquirer
@@ -22,7 +22,7 @@ describe('CLI Inputs', () => {
       language: 'TypeScript',
     });
 
-    const answers = await questions();
+    const answers = await askUserChoices();
 
     expect(inquirer.prompt).toHaveBeenCalledTimes(1);
     expect(answers.language).toBe('TypeScript');
