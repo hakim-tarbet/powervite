@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "paths": {
       "@cli/*": ["src/cli/*"],
-      "@vite/*": ["src/vite/*"],
+      "@core/*": ["src/core/*"],
     },
     "outDir": "dist",
     "rootDir": ".",

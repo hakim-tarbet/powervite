@@ -6,7 +6,7 @@ jest.mock('inquirer', () => ({
   prompt: jest.fn(),
 }));
 
-describe('CLI Inputs', () => {
+describe('CLI Prompts', () => {
   let inquirerMock: jest.Mock;
 
   beforeEach(() => {
