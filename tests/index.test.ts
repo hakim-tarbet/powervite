@@ -1,91 +1,121 @@
 import * as inputs from '../src/cli/inputs';
 import * as setup from '../src/cli/setup';
-import { PowerVite } from '../src/index';
+import { PowerVite, PowerViteInitProject } from '../src/index';
 
 // Mock dependencies
 jest.mock('execa', () => ({
   execa: jest.fn(),
 }));
 
-jest.mock('../src/cli/inputs', () => ({
-  questions: jest.fn().mockResolvedValue({
-    projectName: 'test-project',
-    language: 'TypeScript',
-  }),
-}));
+describe('PowerVite CLI', () => {
+  let questionsSpy: jest.SpyInstance;
+  let createViteProjectSpy: jest.SpyInstance;
+  let consoleErrorSpy: jest.SpyInstance;
+  let consoleLogSpy: jest.SpyInstance;
+  let powerViteInitProjectSpy: jest.SpyInstance;
+  let PowerViteModule: () => Promise<void>;
 
-jest.mock('../src/cli/setup');
-
-describe('PowerVite CLI function', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    questionsSpy = jest.spyOn(inputs, 'questions');
+    createViteProjectSpy = jest.spyOn(setup, 'createViteProject');
+    consoleErrorSpy = jest.spyOn(console, 'error');
+    consoleLogSpy = jest.spyOn(console, 'log');
   });
 
-  it('should ask questions to user about the project', async () => {
-    jest.spyOn(inputs, 'questions').mockResolvedValue({
-      projectName: 'test-project',
-      language: 'TypeScript',
-    });
-
-    jest.spyOn(setup, 'createViteProject').mockResolvedValue(undefined);
-
-    await PowerVite();
-
-    expect(inputs.questions).toHaveBeenCalledTimes(1);
+  afterEach(() => {
+    questionsSpy.mockClear();
+    createViteProjectSpy.mockClear();
+    consoleErrorSpy.mockClear();
   });
 
-  it('should create vite react project with TypeScript', async () => {
-    jest.spyOn(inputs, 'questions').mockResolvedValue({
-      projectName: 'test-project',
-      language: 'TypeScript',
+  describe('Command parser', () => {
+    beforeEach(() => {
+      jest.resetModules();
+      process.argv = ['node', 'script.js'];
     });
 
-    jest.spyOn(setup, 'createViteProject').mockResolvedValue(undefined);
+    it('should return "Command not valid" error if command is not soported', async () => {
+      process.argv = ['node', 'script.js', 'unknown'];
 
-    await PowerVite();
-
-    expect(setup.createViteProject).toHaveBeenCalledTimes(1);
-    expect(setup.createViteProject).toHaveBeenCalledWith(
-      'test-project',
-      'react-ts'
-    );
+      await PowerVite();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Command not valid');
+    });
   });
 
-  it('should create vite react project with JavaScript', async () => {
-    jest.spyOn(inputs, 'questions').mockResolvedValue({
-      projectName: 'test-project',
-      language: 'JavaScript',
+  describe('Init vite project', () => {
+    beforeEach(() => {
+      questionsSpy.mockResolvedValue({
+        language: 'TypeScript',
+      });
+
+      createViteProjectSpy.mockResolvedValue(undefined);
     });
 
-    jest.spyOn(setup, 'createViteProject').mockResolvedValue(undefined);
-
-    await PowerVite();
-
-    expect(setup.createViteProject).toHaveBeenCalledTimes(1);
-    expect(setup.createViteProject).toHaveBeenCalledWith(
-      'test-project',
-      'react'
-    );
-  });
-
-  it('should handle errors if project could not be created', async () => {
-    jest.spyOn(inputs, 'questions').mockResolvedValue({
-      projectName: 'test-project',
-      language: 'TypeScript',
+    it('should ask user about project options', async () => {
+      await PowerViteInitProject('test-project');
+      expect(inputs.questions).toHaveBeenCalledTimes(1);
     });
 
-    jest
-      .spyOn(setup, 'createViteProject')
-      .mockRejectedValue(new Error('Failed'));
+    it('should create a new project with default name if not indicated', async () => {
+      await PowerViteInitProject();
 
-    console.error = jest.fn();
+      expect(setup.createViteProject).toHaveBeenCalledTimes(1);
+      expect(setup.createViteProject).toHaveBeenCalledWith(
+        'my-app',
+        'react-ts'
+      );
+    });
 
-    await PowerVite();
+    it('should create a new TypeScript react project if indicated by user', async () => {
+      await PowerViteInitProject('test-project');
 
-    expect(setup.createViteProject).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenCalledWith(
-      'Failed creating the project:',
-      expect.any(Error)
-    );
+      expect(setup.createViteProject).toHaveBeenCalledTimes(1);
+      expect(setup.createViteProject).toHaveBeenCalledWith(
+        'test-project',
+        'react-ts'
+      );
+    });
+
+    it('should create a new JavaScript react project if indicated by user', async () => {
+      questionsSpy.mockResolvedValue({
+        language: 'JavaScript',
+      });
+
+      await PowerViteInitProject('test-project');
+
+      expect(setup.createViteProject).toHaveBeenCalledTimes(1);
+      expect(setup.createViteProject).toHaveBeenCalledWith(
+        'test-project',
+        'react'
+      );
+    });
+
+    it('should handle errors if project creation fails', async () => {
+      createViteProjectSpy.mockRejectedValue(new Error('Failed'));
+
+      await PowerViteInitProject('test-project');
+
+      expect(setup.createViteProject).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed creating the project:',
+        expect.any(Error)
+      );
+    });
+
+    it('should show project creation logs in terminal', async () => {
+      await PowerViteInitProject('react-test-project');
+      
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        "Welcome to PowerVite! Let’s bootstrap your project."
+      );
+      
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        "Creating your react project named 'react-test-project' in 'TypeScript'..."
+      );
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        "Project 'react-test-project' created successfully!"
+      );
+    });
   });
 });

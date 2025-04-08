@@ -7,23 +7,18 @@ jest.mock('inquirer', () => ({
 }));
 
 describe('CLI Inputs', () => {
+  let inquirerMock: jest.Mock;
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    inquirerMock = (inquirer.prompt as unknown as jest.Mock)
   });
 
-  it('should ask for project name', async () => {
-    (inquirer.prompt as unknown as jest.Mock).mockResolvedValue({
-      projectName: 'test-project',
-    });
-
-    const answers = await questions();
-
-    expect(inquirer.prompt).toHaveBeenCalledTimes(1);
-    expect(answers.projectName).toBe('test-project');
+  afterAll(() => {
+    inquirerMock.mockClear();
   });
 
   it('should ask for project langauge', async () => {
-    (inquirer.prompt as unknown as jest.Mock).mockResolvedValue({
+    inquirerMock.mockResolvedValue({
       language: 'TypeScript',
     });
 
