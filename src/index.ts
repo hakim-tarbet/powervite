@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { questions } from './cli/inputs';
-import { createViteProject } from './cli/setup';
+import { questions } from '@cli/inputs';
+import { createViteProject } from '@cli/setup';
 
 export async function PowerViteInitProject(name?: string) {
   console.log('Welcome to PowerVite! Let’s bootstrap your project.');

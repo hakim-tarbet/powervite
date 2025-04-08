@@ -1,4 +1,4 @@
-import { questions } from '../../src/cli/inputs';
+import { questions } from '@cli/inputs';
 import inquirer from 'inquirer';
 
 // Mock inquirer

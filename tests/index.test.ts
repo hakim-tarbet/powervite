@@ -1,5 +1,5 @@
-import * as inputs from '../src/cli/inputs';
-import * as setup from '../src/cli/setup';
+import * as inputs from '@cli/inputs';
+import * as setup from '@cli/setup';
 import { PowerVite, PowerViteInitProject } from '../src/index';
 
 // Mock dependencies

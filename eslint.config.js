@@ -3,7 +3,7 @@ import typescriptParser from '@typescript-eslint/parser';
 
 export default [
   {
-    ignores: ['node_modules', 'dist', 'coverage'], // Directories to ignore
+    ignores: ['node_modules', 'dist', 'coverage'],
   },
   {
     files: ['src/**/*.ts'],
@@ -16,6 +16,13 @@ export default [
     },
     plugins: {
       '@typescript-eslint': typescriptPlugin,
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+        },
+      },
     },
     rules: {
       'semi': ['error', 'always'],

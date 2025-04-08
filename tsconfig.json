@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@cli/*": ["src/cli/*"],
+    },
     "outDir": "dist",
     "rootDir": "src",
     "module": "ESNext",

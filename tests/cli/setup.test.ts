@@ -1,4 +1,4 @@
-import { createViteProject } from '../../src/cli/setup';
+import { createViteProject } from '@cli/setup';
 import { execa } from 'execa';
 
 // Mock execa
