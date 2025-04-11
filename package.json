@@ -1,7 +1,7 @@
 {
   "name": "powervite",
   "version": "1.0.0",
-  "description": "PowerVite: A CLI tool to bootstrap Vite js projects with customizable options.",
+  "description": "Powervite: A CLI tool to bootstrap Vite js projects with customizable options.",
   "author": "Hakim Tarbet Angri <ha.tarbet@gmail.com>",
   "main": "dist/index.js",
   "license": "MIT",
