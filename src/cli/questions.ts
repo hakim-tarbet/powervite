@@ -22,5 +22,17 @@ export const questions: PromptObject[] = [
             {title: 'Ant Design', value: 'ant-design'},
         ],
         initial: 0
-    }
+    },
+    {
+        type: 'select',
+        name: 'linting',
+        message: 'Choose the lint and prettier option:',
+        choices: [
+          {title: 'None', value: 'none'},
+          {title: 'Only ESLint', value: 'eslint'},
+          {title: 'Only Prettier', value: 'prettier'},
+          {title: 'ESLint + Prettier', value: 'eslint-prettier'},
+        ],
+        initial: 0,
+      },
 ];
