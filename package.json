@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@esbuild-kit/esm-loader": "^2.6.5",
+    "consola": "^3.4.2",
     "execa": "^9.5.1",
+    "figlet": "^1.8.0",
     "fs-extra": "^11.2.0",
-    "inquirer": "^12.1.0",
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.0"
   },

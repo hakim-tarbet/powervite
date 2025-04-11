@@ -1,8 +1,12 @@
-import { askUserChoices } from '@cli/prompts';
 import { execa } from 'execa';
+import ora from 'ora';
+import { consola } from 'consola';
+import { printBanner } from '@utils/banner';
+import { askUserChoices } from '@cli/prompts';
 
-export const initProject = async (projectName: string, template: string) => {
+const initProject = async (projectName: string, template: string) => {
   try {
+    consola.info(`Running: npm create vite@latest ${projectName} --template ${template}\n`);
     await execa('npm', ['create', 'vite@latest', projectName, '--', '--template', template], { stdio: 'ignore' });
   } catch (error) {
     throw error;
@@ -10,25 +14,26 @@ export const initProject = async (projectName: string, template: string) => {
 };
 
 export const PowerViteInitProject = async (name?: string) => {
-  console.log('Welcome to PowerVite! Let’s bootstrap your project.');
+  printBanner();
   
   // Questions about the project
-  const projectName = typeof name === 'undefined' ? 'my-app' : name;
-  const { language } = await askUserChoices();
-  const template = language === 'TypeScript' ? 'react-ts' : 'react';
+  const projectName = !name ? 'my-app' : name;
+  const { useTs } = await askUserChoices();
+  const template = useTs ? 'react-ts' : 'react';
 
-  // Create vitjs base project
+  const spinner = ora(`Setting up react project with ${useTs ? 'TypeScript' : 'Javascript'} in '${projectName}'`).start();
+
+  // Create vite react base project
   try {
-    console.log(`Creating your react project named '${projectName}' in '${language}'...`);
-    
     await initProject(projectName, template);
+    spinner.succeed('Project created successfully!');
 
-    console.log(`Project '${projectName}' created successfully!`);
-    console.log('Next steps:');
-    console.log(`1.  cd ${projectName}`);
-    console.log('2.  npm install');
-    console.log('3.  npm run dev');
+    consola.info('Next steps:');
+    consola.info(`1.  cd ${projectName}`);
+    consola.info('2.  npm install');
+    consola.info('3.  npm run dev');
   } catch (error) {
-    console.error('Failed creating the project:', error);
+    spinner.fail('Project creation failed please try again.');
+    consola.error(error);
   }
 };

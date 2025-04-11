@@ -1,30 +1,21 @@
 import { askUserChoices } from '@cli/prompts';
-import inquirer from 'inquirer';
+import prompts from 'prompts';
 
-// Mock inquirer
-jest.mock('inquirer', () => ({
-  prompt: jest.fn(),
-}));
+jest.mock('prompts');
 
-describe('CLI Prompts', () => {
-  let inquirerMock: jest.Mock;
+describe('CLI Prompts should', () => {
+  const promptsMock = prompts as jest.Mock;
 
-  beforeEach(() => {
-    inquirerMock = (inquirer.prompt as unknown as jest.Mock)
+  afterEach(() => {
+    promptsMock.mockClear();
   });
 
-  afterAll(() => {
-    inquirerMock.mockClear();
-  });
-
-  it('should ask for project langauge', async () => {
-    inquirerMock.mockResolvedValue({
-      language: 'TypeScript',
-    });
+  test('should ask the user if they want to use TypeScript', async () => {
+    promptsMock.mockResolvedValue({ useTypescript: true });
 
     const answers = await askUserChoices();
 
-    expect(inquirer.prompt).toHaveBeenCalledTimes(1);
-    expect(answers.language).toBe('TypeScript');
+    expect(promptsMock).toHaveBeenCalledTimes(1);
+    expect(answers.useTypescript).toBe(true);
   });
 });

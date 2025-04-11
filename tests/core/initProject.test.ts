@@ -1,19 +1,61 @@
-import { initProject, PowerViteInitProject } from '@core/initProject';
-import * as prompts from '@cli/prompts';
-import * as vite from '@core/initProject';
+import { askUserChoices } from '@cli/prompts';
+import { PowerViteInitProject } from '@core/initProject';
+import { printBanner } from '@utils/banner';
+import { consola } from 'consola';
 import { execa } from 'execa';
+import ora from 'ora';
 
-// Mock execa
 jest.mock('execa', () => ({
-  execa: jest.fn(),
+  execa: jest.fn().mockResolvedValue(undefined),
 }));
 
-describe('Vite init project', () => {
-  it('should create a project using execa', async () => {
-    (execa as jest.Mock).mockResolvedValue({});
+jest.mock('ora', () => {
+  return jest.fn(() => ({
+    start: jest.fn().mockReturnThis(),
+    succeed: jest.fn(),
+    fail: jest.fn(),
+  }));
+});
 
-    await initProject('test-project', 'react-ts');
+jest.mock('consola', () => ({
+  consola: {
+    error: jest.fn().mockImplementation(() => undefined),
+    log: jest.fn().mockImplementation(() => undefined),
+    info: jest.fn().mockImplementation(() => undefined),
+  },
+}));
 
+jest.mock('@cli/prompts', () => ({
+  askUserChoices: jest.fn().mockResolvedValue({
+    useTs: true,
+  })
+}));
+
+jest.mock('@utils/banner', () => ({
+  printBanner: jest.fn().mockResolvedValue(undefined)
+}));
+
+describe('Vite init project should', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('print the welcome banner', async () => {
+    await PowerViteInitProject('test-project');
+
+    expect(printBanner).toHaveBeenCalledTimes(1);
+  });
+
+  test('ask the user about project settings', async () =>  {
+    await PowerViteInitProject('test-project');
+    
+    expect(askUserChoices).toHaveBeenCalledTimes(1);
+  });
+
+  test('create a TypeScript React project with the indicated project name', async () => {
+    await PowerViteInitProject('test-project');
+
+    expect(execa).toHaveBeenCalledTimes(1);
     expect(execa).toHaveBeenCalledWith('npm', [
       'create',
       'vite@latest',
@@ -24,101 +66,61 @@ describe('Vite init project', () => {
     ], { stdio: 'ignore' });
   });
 
-  it('should throw an error if project creation fails', async () => {
-    (execa as jest.Mock).mockRejectedValue(new Error('Failed'));
-
-    await expect(initProject('test-project', 'react-ts')).rejects.toThrow('Failed');
-  });
-});
-
-describe('Init vite project', () => {
-  let questionsSpy: jest.SpyInstance;
-  let viteInitProjectSpy: jest.SpyInstance;
-  let consoleErrorSpy: jest.SpyInstance;
-  let consoleLogSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
-    viteInitProjectSpy = jest.spyOn(vite, 'initProject');
-    questionsSpy = jest.spyOn(prompts, 'askUserChoices').mockResolvedValue({
-      language: 'TypeScript',
-    });
-
-    viteInitProjectSpy.mockResolvedValue(undefined);
-  });
-
-  afterEach(() => {
-    questionsSpy.mockClear();
-    viteInitProjectSpy.mockClear();
-    consoleErrorSpy.mockClear();
-    consoleLogSpy.mockClear();
-  });
-
-  it('should ask user about project options', async () => {
-    await PowerViteInitProject('test-project');
-    expect(prompts.askUserChoices).toHaveBeenCalledTimes(1);
-  });
-
-  it('should create a new project with default name if not indicated', async () => {
+  test('create a TypeScript React project with default project name if not indicated', async () => {
     await PowerViteInitProject();
 
-    expect(vite.initProject).toHaveBeenCalledTimes(1);
-    expect(vite.initProject).toHaveBeenCalledWith(
+    expect(execa).toHaveBeenCalledTimes(1);
+    expect(execa).toHaveBeenCalledWith('npm', [
+      'create',
+      'vite@latest',
       'my-app',
-      'react-ts'
-    );
+      '--',
+      '--template',
+      'react-ts',
+    ], { stdio: 'ignore' });
   });
 
-  it('should create a new TypeScript react project if indicated by user', async () => {
+  test('create a JavaScript React project if indicated by selected by user', async () => {
+    (askUserChoices as jest.Mock).mockResolvedValue({
+      useTs: false
+    })
+
+    await PowerViteInitProject();
+
+    expect(execa).toHaveBeenCalledTimes(1);
+    expect(execa).toHaveBeenCalledWith('npm', [
+      'create',
+      'vite@latest',
+      'my-app',
+      '--',
+      '--template',
+      'react',
+    ], { stdio: 'ignore' });
+  });
+
+  test('Show the success create project messages and steps', async () => {
     await PowerViteInitProject('test-project');
 
-    expect(vite.initProject).toHaveBeenCalledTimes(1);
-    expect(vite.initProject).toHaveBeenCalledWith(
-      'test-project',
-      'react-ts'
-    );
-  });
+    const oraMock = ora as jest.Mock;
+    const spinnerInstance = oraMock.mock.results[0].value;
 
-  it('should create a new JavaScript react project if indicated by user', async () => {
-    questionsSpy.mockResolvedValue({
-      language: 'JavaScript',
-    });
-
-    await PowerViteInitProject('test-project');
-
-    expect(vite.initProject).toHaveBeenCalledTimes(1);
-    expect(vite.initProject).toHaveBeenCalledWith(
-      'test-project',
-      'react'
-    );
-  });
-
-  it('should handle errors if project creation fails', async () => {
-    viteInitProjectSpy.mockRejectedValue(new Error('Failed'));
-
-    await PowerViteInitProject('test-project');
-
-    expect(vite.initProject).toHaveBeenCalledTimes(1);
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Failed creating the project:',
-      expect.any(Error)
-    );
-  });
-
-  it('should show project creation logs in terminal', async () => {
-    await PowerViteInitProject('react-test-project');
+    expect(spinnerInstance.succeed).toHaveBeenCalledWith('Project created successfully!');
     
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      "Welcome to PowerVite! Let’s bootstrap your project."
-    );
-    
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      "Creating your react project named 'react-test-project' in 'TypeScript'..."
-    );
+    expect(consola.info).toHaveBeenCalledWith('Next steps:');
+    expect(consola.info).toHaveBeenCalledWith('1.  cd test-project');
+    expect(consola.info).toHaveBeenCalledWith('2.  npm install');
+    expect(consola.info).toHaveBeenCalledWith('3.  npm run dev');
+  });
 
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      "Project 'react-test-project' created successfully!"
-    );
+  test('throw an error if project creation fails', async () => {
+    (execa as jest.Mock).mockRejectedValue(new Error('Failed'));
+
+    await PowerViteInitProject('test-project');
+
+    const oraMock = ora as jest.Mock;
+    const spinnerInstance = oraMock.mock.results[0].value;
+
+    expect(spinnerInstance.fail).toHaveBeenCalledWith('Project creation failed please try again.');
+    expect(consola.error).toHaveBeenCalledWith(expect.any(Error));
   });
 });

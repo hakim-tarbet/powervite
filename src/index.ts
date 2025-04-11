@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { PowerViteInitProject } from '@core/initProject';
+import { consola } from 'consola';
 
 export const PowerVite = async () => {
   const args = process.argv.slice(2);
@@ -12,7 +13,7 @@ export const PowerVite = async () => {
       await PowerViteInitProject(projectName);
       break;
     default:
-      console.error('Command not valid');
+      consola.error('Command not valid');
       break;
   }
 };

@@ -10,6 +10,7 @@ export default {
   transformIgnorePatterns: ['node_modules/(?!(execa)/)'],
   moduleNameMapper: {
     '^@cli/(.*)$': '<rootDir>/src/cli/$1',
-    '^@core/(.*)$': '<rootDir>/src/core/$1'
+    '^@core/(.*)$': '<rootDir>/src/core/$1',
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1'
   },
 };

@@ -1,10 +1,12 @@
-import inquirer from 'inquirer';
+import prompts from 'prompts';
 
 export const askUserChoices = async () => {
-  return inquirer.prompt([{
-    type: 'list',
-    name: 'language',
-    message: 'Choose your language:',
-    choices: ['TypeScript', 'JavaScript'],
-  }]);
+  const response = await prompts({
+    type: 'confirm',
+    name: 'useTypescript',
+    message: 'Do you want to use TypeScript?',
+    initial: true
+  });
+
+  return response;
 };

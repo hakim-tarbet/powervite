@@ -1,42 +1,37 @@
-import * as prompts from '@cli/prompts';
 import * as vite from '@core/initProject';
+import { consola } from 'consola';
 import { PowerVite } from '../src/index';
 
 // Mock dependencies
-jest.mock('execa', () => ({
-  execa: jest.fn(),
+jest.mock('@core/initProject', () => ({
+  PowerViteInitProject: jest.fn().mockResolvedValue(undefined),
 }));
 
-describe('PowerVite CLI', () => {
-  let questionsSpy: jest.SpyInstance;
-  let viteInitProjectSpy: jest.SpyInstance;
-  let consoleErrorSpy: jest.SpyInstance;
-  let consoleLogSpy: jest.SpyInstance;
+jest.mock('consola', () => ({
+  consola: {
+    error: jest.fn().mockImplementation(() => undefined),
+  },
+}));
 
-  beforeEach(() => {
-    questionsSpy = jest.spyOn(prompts, 'askUserChoices').mockRejectedValue(undefined);
-    viteInitProjectSpy = jest.spyOn(vite, 'PowerViteInitProject').mockResolvedValue(undefined);
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
-  });
-
+describe('PowerVite CLI should', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should create a project when command is "init"', async () => {
+  test('create a project when command is "init"', async () => {
     process.argv = ['node', 'script.js', 'init', 'cli-project'];
 
     await PowerVite();
 
-    expect(viteInitProjectSpy).toHaveBeenCalledTimes(1);
-    expect(viteInitProjectSpy).toHaveBeenCalledWith('cli-project');
+    expect(vite.PowerViteInitProject).toHaveBeenCalledTimes(1);
+    expect(vite.PowerViteInitProject).toHaveBeenCalledWith('cli-project');
   });
 
-  it('should return "Command not valid" error if command is not soported', async () => {
+  test('show "Command not valid" error if command is not supported', async () => {
     process.argv = ['node', 'script.js', 'unknown'];
 
     await PowerVite();
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Command not valid');
+
+    expect(consola.error).toHaveBeenCalledWith('Command not valid');
   });
 });
