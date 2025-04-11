@@ -13,7 +13,7 @@ jest.mock('consola', () => ({
   },
 }));
 
-describe('PowerVite CLI should', () => {
+describe('Powervite CLI should', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
