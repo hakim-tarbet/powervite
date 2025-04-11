@@ -34,5 +34,16 @@ export const questions: PromptObject[] = [
           {title: 'ESLint + Prettier', value: 'eslint-prettier'},
         ],
         initial: 0,
-      },
+    },
+    {
+        type: 'select',
+        name: 'testing',
+        message: 'Choose the unit testing framework you prefer:',
+        choices: [
+          {title: 'None', value: 'none'},
+          {title: 'Jest', value: 'jest'},
+          {title: 'Vitest', value: 'vitest'},
+        ],
+        initial: 0,
+    },
 ];

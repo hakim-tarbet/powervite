@@ -12,8 +12,6 @@ describe('CLI Prompts should', () => {
   });
 
   test('ask if user wants to use TypeScript', async () => {
-    promptsMock.mockResolvedValueOnce({ useTypescript: true });
-
     await promptProjectOptions(onCancelMock);
 
     expect(promptsMock).toHaveBeenCalledWith(
@@ -30,8 +28,6 @@ describe('CLI Prompts should', () => {
   });
 
   test('ask the user about styling/theme options', async () => {
-    promptsMock.mockResolvedValueOnce({ style: 'tailwind' });
-
     await promptProjectOptions(onCancelMock);
 
     expect(promptsMock).toHaveBeenCalledWith(
@@ -58,8 +54,6 @@ describe('CLI Prompts should', () => {
   });
 
   test('ask the user about linting option', async () => {
-    promptsMock.mockResolvedValueOnce({ linting: 'eslint-prettier' });
-
     await promptProjectOptions(onCancelMock);
 
     expect(promptsMock).toHaveBeenCalledWith(
@@ -73,6 +67,27 @@ describe('CLI Prompts should', () => {
             {title: "Only ESLint", value: "eslint"},
             {title: "Only Prettier", value: "prettier"},
             {title: "ESLint + Prettier", value: "eslint-prettier"},
+          ],
+          initial: 0,
+        }),
+      ]),
+      expect.objectContaining({ onCancel: expect.any(Function) })
+    );
+  });
+
+  test('ask the user about unit testing option', async () => {
+    await promptProjectOptions(onCancelMock);
+
+    expect(promptsMock).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'select',
+          name: 'testing',
+          message: 'Choose the unit testing framework you prefer:',
+          choices: [
+            {title: 'None', value: 'none'},
+            {title: 'Jest', value: 'jest'},
+            {title: 'Vitest', value: 'vitest'},
           ],
           initial: 0,
         }),
