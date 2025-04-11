@@ -1,11 +1,16 @@
 import prompts from 'prompts';
+import { questions } from './questions';
 
-export const askUserChoices = async () => {
-  const response = await prompts({
-    type: 'confirm',
-    name: 'useTypescript',
-    message: 'Do you want to use TypeScript?',
-    initial: true
+export const askUserChoices = async (onCancel: () => void) => {
+  const response = await prompts(questions, {
+    onCancel: (prompt) => {
+      if (prompt) {
+        onCancel();
+        return true;
+      }
+
+      return false;
+    },
   });
 
   return response;

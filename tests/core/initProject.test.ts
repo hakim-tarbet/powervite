@@ -27,7 +27,7 @@ jest.mock('consola', () => ({
 
 jest.mock('@cli/prompts', () => ({
   askUserChoices: jest.fn().mockResolvedValue({
-    useTs: true,
+    useTypescript: true,
   })
 }));
 

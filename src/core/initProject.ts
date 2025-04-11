@@ -5,12 +5,13 @@ import { printBanner } from '@utils/banner';
 import { askUserChoices } from '@cli/prompts';
 
 const initProject = async (projectName: string, template: string) => {
-  try {
-    consola.info(`Running: npm create vite@latest ${projectName} --template ${template}\n`);
-    await execa('npm', ['create', 'vite@latest', projectName, '--', '--template', template], { stdio: 'ignore' });
-  } catch (error) {
-    throw error;
-  }
+  consola.info(`Running: npm create vite@latest ${projectName} --template ${template}\n`);
+  await execa('npm', ['create', 'vite@latest', projectName, '--', '--template', template], { stdio: 'ignore' });
+};
+
+const onCancelQuestionHandler = () => {
+  consola.error('Questions cancelled');
+  process.exit(1);
 };
 
 export const PowerViteInitProject = async (name?: string) => {
@@ -18,10 +19,10 @@ export const PowerViteInitProject = async (name?: string) => {
   
   // Questions about the project
   const projectName = !name ? 'my-app' : name;
-  const { useTs } = await askUserChoices();
-  const template = useTs ? 'react-ts' : 'react';
+  const { useTypescript } = await askUserChoices(onCancelQuestionHandler);
+  const template = useTypescript ? 'react-ts' : 'react';
 
-  const spinner = ora(`Setting up react project with ${useTs ? 'TypeScript' : 'Javascript'} in '${projectName}'`).start();
+  const spinner = ora(`Setting up react project with ${useTypescript ? 'TypeScript' : 'Javascript'} in '${projectName}'\n`).start();
 
   // Create vite react base project
   try {

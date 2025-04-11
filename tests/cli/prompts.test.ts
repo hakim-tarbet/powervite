@@ -4,39 +4,94 @@ import prompts from 'prompts';
 jest.mock('prompts');
 
 describe('CLI Prompts should', () => {
+  const onCancelMock = jest.fn();
+  const promptsMock = prompts as jest.Mock;
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test('ask the user if want to use TypeScript or not', async () => {
-    const response = await askUserChoices();
+  test('ask if user wants to use TypeScript', async () => {
+    promptsMock.mockResolvedValueOnce({ useTypescript: true });
 
-    expect(prompts).toHaveBeenCalledWith({
-      type: 'confirm',
-      name: 'useTypescript',
-      message: 'Do you want to use TypeScript?',
-      initial: true,
-    });
+    await askUserChoices(onCancelMock);
+
+    expect(promptsMock).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'confirm',
+          name: 'useTypescript',
+          message: 'Do you want to use TypeScript?',
+          initial: true,
+        }),
+      ]),
+      expect.objectContaining({ onCancel: expect.any(Function) })
+    );
   });
 
-  test('ask the user about the styling options', async () => {
-    const response = await askUserChoices();
+  test('ask the user about styling/theme options', async () => {
+    promptsMock.mockResolvedValueOnce({ style: 'tailwind' });
 
-    expect(prompts).toHaveBeenCalledWith({
-      type: 'select',
-      name: 'style',
-      message: 'Choose a styling and/or theme option:',
-      choices: [
-        {title: 'None (Plain CSS)', value: 'none'},
-        {title: 'SCSS / Sass', value: 'scss'},
-        {title: 'Styled Components', value: 'styled-components'},
-        {title: 'Tailwind CSS', value: 'tailwind'},
-        {title: 'Bootstrap UI', value: 'bootstrap'},
-        {title: 'Material UI', value: 'material-ui'},
-        {title: 'Chakra UI', value: 'chakra-ui'},
-        {title: 'Ant Design', value: 'ant-design'},
-      ],
-      initial: 0
+    await askUserChoices(onCancelMock);
+
+    expect(promptsMock).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'select',
+          name: 'style',
+          message: 'Choose a styling and/or theme option:',
+          choices: [
+            {"title": "None (Plain CSS)", "value": "none"},
+            {"title": "SCSS / Sass", "value": "scss"},
+            {"title": "Styled Components", "value": "styled-components"},
+            {"title": "Tailwind CSS", "value": "tailwind"},
+            {"title": "Bootstrap UI", "value": "bootstrap"},
+            {"title": "Material UI", "value": "material-ui"},
+            {"title": "Chakra UI", "value": "chakra-ui"},
+            {"title": "Ant Design", "value": "ant-design"}
+          ],
+        }),
+      ]),
+      expect.objectContaining({ onCancel: expect.any(Function) })
+    );
+  });
+
+  test('call onCancel when user manually cancels (e.g. Ctrl+C)', async () => {
+    promptsMock.mockImplementation(async (_questions, options) => {
+      // Simulate manual cancel (Ctrl+C)
+      if (options?.onCancel) {
+        options.onCancel({ type: 'confirm', name: 'useTypescript' });
+      }
+      return {};
     });
+
+    await askUserChoices(onCancelMock);
+
+    expect(onCancelMock).toHaveBeenCalledTimes(1);
+  });
+
+  test('not call onCancel if it is not cancelled manually', async () => {
+    promptsMock.mockImplementation(async (_questions, options) => {
+      // Simulate manual cancel (Ctrl+C)
+      if (options?.onCancel) {
+        options.onCancel(null);
+      }
+      return {};
+    });
+
+    await askUserChoices(onCancelMock);
+
+    expect(onCancelMock).not.toHaveBeenCalledTimes(1);
+  });
+
+  test('NOT call onCancel if user completes prompts', async () => {
+    promptsMock.mockResolvedValueOnce({
+      useTypescript: true,
+      style: 'tailwind',
+    });
+
+    await askUserChoices(onCancelMock);
+
+    expect(onCancelMock).not.toHaveBeenCalled();
   });
 });
