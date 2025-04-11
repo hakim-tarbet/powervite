@@ -1,5 +1,5 @@
-import { askUserChoices } from '@cli/prompts';
-import { PowerViteInitProject } from '@core/initProject';
+import { promptProjectOptions } from '@cli/prompts';
+import { initProject } from '@core/init';
 import { printBanner } from '@utils/banner';
 import { consola } from 'consola';
 import { execa } from 'execa';
@@ -26,7 +26,7 @@ jest.mock('consola', () => ({
 }));
 
 jest.mock('@cli/prompts', () => ({
-  askUserChoices: jest.fn().mockResolvedValue({
+  promptProjectOptions: jest.fn().mockResolvedValue({
     useTypescript: true,
   })
 }));
@@ -41,19 +41,19 @@ describe('Vite init project should', () => {
   });
 
   test('print the welcome banner', async () => {
-    await PowerViteInitProject('test-project');
+    await initProject('test-project');
 
     expect(printBanner).toHaveBeenCalledTimes(1);
   });
 
   test('ask the user about project settings', async () =>  {
-    await PowerViteInitProject('test-project');
+    await initProject('test-project');
     
-    expect(askUserChoices).toHaveBeenCalledTimes(1);
+    expect(promptProjectOptions).toHaveBeenCalledTimes(1);
   });
 
   test('create a TypeScript React project with the indicated project name', async () => {
-    await PowerViteInitProject('test-project');
+    await initProject('test-project');
 
     expect(execa).toHaveBeenCalledTimes(1);
     expect(execa).toHaveBeenCalledWith('npm', [
@@ -67,7 +67,7 @@ describe('Vite init project should', () => {
   });
 
   test('create a TypeScript React project with default project name if not indicated', async () => {
-    await PowerViteInitProject();
+    await initProject();
 
     expect(execa).toHaveBeenCalledTimes(1);
     expect(execa).toHaveBeenCalledWith('npm', [
@@ -81,11 +81,11 @@ describe('Vite init project should', () => {
   });
 
   test('create a JavaScript React project if indicated by selected by user', async () => {
-    (askUserChoices as jest.Mock).mockResolvedValue({
+    (promptProjectOptions as jest.Mock).mockResolvedValue({
       useTs: false
     })
 
-    await PowerViteInitProject();
+    await initProject();
 
     expect(execa).toHaveBeenCalledTimes(1);
     expect(execa).toHaveBeenCalledWith('npm', [
@@ -99,7 +99,7 @@ describe('Vite init project should', () => {
   });
 
   test('Show the success create project messages and steps', async () => {
-    await PowerViteInitProject('test-project');
+    await initProject('test-project');
 
     const oraMock = ora as jest.Mock;
     const spinnerInstance = oraMock.mock.results[0].value;
@@ -108,19 +108,39 @@ describe('Vite init project should', () => {
     
     expect(consola.info).toHaveBeenCalledWith('Next steps:');
     expect(consola.info).toHaveBeenCalledWith('1.  cd test-project');
-    expect(consola.info).toHaveBeenCalledWith('2.  npm install');
-    expect(consola.info).toHaveBeenCalledWith('3.  npm run dev');
+    expect(consola.info).toHaveBeenCalledWith('2.  npm run dev');
   });
 
   test('throw an error if project creation fails', async () => {
     (execa as jest.Mock).mockRejectedValue(new Error('Failed'));
 
-    await PowerViteInitProject('test-project');
+    await initProject('test-project');
 
     const oraMock = ora as jest.Mock;
     const spinnerInstance = oraMock.mock.results[0].value;
 
-    expect(spinnerInstance.fail).toHaveBeenCalledWith('Project creation failed please try again.');
+    expect(spinnerInstance.fail).toHaveBeenCalledWith('Project creation failed. Please try again.');
     expect(consola.error).toHaveBeenCalledWith(expect.any(Error));
+  });
+  
+  test('handle prompt cancellation by logging error and exiting process', async () => {
+    // Override the promptProjectOptions to immediately trigger the cancellation callback.
+    (promptProjectOptions as jest.Mock).mockImplementation(
+      (onCancel: () => void) => {
+        onCancel();
+        return Promise.resolve({});
+      }
+    );
+
+    // Spy on process.exit and override it to throw an error so we can catch it.
+    const exitSpy = jest.spyOn(process, 'exit').mockImplementation((code?: number) => {
+      throw new Error(`process.exit: ${code}`);
+    });
+
+    await expect(initProject('test-project')).rejects.toThrow('process.exit: 1');
+
+    expect(consola.error).toHaveBeenCalledWith('Questions cancelled');
+    
+    exitSpy.mockRestore();
   });
 });

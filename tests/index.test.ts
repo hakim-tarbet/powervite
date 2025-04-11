@@ -1,10 +1,10 @@
-import * as vite from '@core/initProject';
+import * as init from '@core/init';
 import { consola } from 'consola';
-import { PowerVite } from '../src/index';
+import { Powervite } from '../src/index';
 
 // Mock dependencies
-jest.mock('@core/initProject', () => ({
-  PowerViteInitProject: jest.fn().mockResolvedValue(undefined),
+jest.mock('@core/init', () => ({
+  initProject: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('consola', () => ({
@@ -21,16 +21,16 @@ describe('PowerVite CLI should', () => {
   test('create a project when command is "init"', async () => {
     process.argv = ['node', 'script.js', 'init', 'cli-project'];
 
-    await PowerVite();
+    await Powervite();
 
-    expect(vite.PowerViteInitProject).toHaveBeenCalledTimes(1);
-    expect(vite.PowerViteInitProject).toHaveBeenCalledWith('cli-project');
+    expect(init.initProject).toHaveBeenCalledTimes(1);
+    expect(init.initProject).toHaveBeenCalledWith('cli-project');
   });
 
   test('show "Command not valid" error if command is not supported', async () => {
     process.argv = ['node', 'script.js', 'unknown'];
 
-    await PowerVite();
+    await Powervite();
 
     expect(consola.error).toHaveBeenCalledWith('Command not valid');
   });

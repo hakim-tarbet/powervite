@@ -1,4 +1,4 @@
-import { askUserChoices } from '@cli/prompts';
+import { promptProjectOptions } from '@cli/prompts';
 import prompts from 'prompts';
 
 jest.mock('prompts');
@@ -14,7 +14,7 @@ describe('CLI Prompts should', () => {
   test('ask if user wants to use TypeScript', async () => {
     promptsMock.mockResolvedValueOnce({ useTypescript: true });
 
-    await askUserChoices(onCancelMock);
+    await promptProjectOptions(onCancelMock);
 
     expect(promptsMock).toHaveBeenCalledWith(
       expect.arrayContaining([
@@ -32,7 +32,7 @@ describe('CLI Prompts should', () => {
   test('ask the user about styling/theme options', async () => {
     promptsMock.mockResolvedValueOnce({ style: 'tailwind' });
 
-    await askUserChoices(onCancelMock);
+    await promptProjectOptions(onCancelMock);
 
     expect(promptsMock).toHaveBeenCalledWith(
       expect.arrayContaining([
@@ -65,7 +65,7 @@ describe('CLI Prompts should', () => {
       return {};
     });
 
-    await askUserChoices(onCancelMock);
+    await promptProjectOptions(onCancelMock);
 
     expect(onCancelMock).toHaveBeenCalledTimes(1);
   });
@@ -79,7 +79,7 @@ describe('CLI Prompts should', () => {
       return {};
     });
 
-    await askUserChoices(onCancelMock);
+    await promptProjectOptions(onCancelMock);
 
     expect(onCancelMock).not.toHaveBeenCalledTimes(1);
   });
@@ -90,7 +90,7 @@ describe('CLI Prompts should', () => {
       style: 'tailwind',
     });
 
-    await askUserChoices(onCancelMock);
+    await promptProjectOptions(onCancelMock);
 
     expect(onCancelMock).not.toHaveBeenCalled();
   });

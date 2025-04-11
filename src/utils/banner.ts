@@ -1,14 +1,20 @@
 import figlet from 'figlet';
 import { consola } from 'consola';
 
-export const printBanner = () => {
-  consola.log(
-    figlet.textSync('Powervite', {
-      font: 'Standard',
-      horizontalLayout: 'default',
-      verticalLayout: 'default',
-    })
-  );
+/**
+ * Prints a stylized banner to the console to introduce the project setup process.
+ *
+ * This function uses the `figlet` library to generate an ASCII art representation
+ * of the word "Powervite" and logs it to the console. After the banner and a
+ * friendly message to indicate the beginning of the bootstrapping process.
+ */
+export const printBanner = (): void => {
+  const bannerText = figlet.textSync('Powervite', {
+    font: 'Standard',
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+  });
 
+  consola.log(bannerText);
   consola.log('Let\'s bootstrap your project!');
 };
