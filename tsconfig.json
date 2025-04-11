@@ -4,6 +4,7 @@
     "paths": {
       "@cli/*": ["src/cli/*"],
       "@core/*": ["src/core/*"],
+      "@features/*": ["src/features/*"],
       "@utils/*": ["src/utils/*"],
     },
     "outDir": "dist",

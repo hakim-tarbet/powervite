@@ -3,11 +3,13 @@ import ora from 'ora';
 import { consola } from 'consola';
 import { printBanner } from '@utils/banner';
 import { promptProjectOptions } from '@cli/prompts';
+import { installAndConfigureStyles } from '@features/styling';
 
 interface ProjectSettings {
   projectName: string;
   template: string;
   language: string;
+  style: string;
 }
 
 
@@ -22,7 +24,7 @@ const getInitProjectSettings = async (name?: string): Promise<ProjectSettings> =
   const projectName = name || 'my-app';
 
   // Prompt user choices regarding their preferences.
-  const { useTypescript } = await promptProjectOptions(() => {
+  const { useTypescript, style } = await promptProjectOptions(() => {
     consola.error('Questions cancelled');
     process.exit(1);
   });
@@ -30,7 +32,7 @@ const getInitProjectSettings = async (name?: string): Promise<ProjectSettings> =
   const template = useTypescript ? 'react-ts' : 'react';
   const language = useTypescript ? 'TypeScript' : 'JavaScript';
 
-  return { projectName, template, language };
+  return { projectName, template, language, style };
 };
 
 /**
@@ -50,12 +52,32 @@ const createReactProject = async (settings: ProjectSettings): Promise<void> => {
       { stdio: 'ignore' }
     );
     spinner.succeed('Project created successfully!');
-    
-    consola.info('Next steps:');
-    consola.info(`1.  cd ${settings.projectName}`);
-    consola.info('2.  npm run dev');
   } catch (error) {
     spinner.fail('Project creation failed. Please try again.');
+    consola.error(error);
+  }
+};
+
+const enterProjectDir = async (settings: ProjectSettings) => {
+  try {
+    process.chdir(settings.projectName);
+  } catch (error) {
+    consola.error(error);
+  }
+};
+
+const parseStylingOption = async (settings: ProjectSettings) => {
+  const spinner = ora('Installing and configuring styling option').start();
+
+  if (settings.style === 'none') {
+    spinner.succeed('Skipped styling option instalation');
+    return;
+  }
+
+  try {
+    await installAndConfigureStyles(settings.style);
+  } catch (error) {
+    spinner.fail('Styling instalation failed. Please try again.');
     consola.error(error);
   }
 };
@@ -75,4 +97,12 @@ export const initProject = async (name?: string): Promise<void> => {
 
   // Create the project using the collected settings.
   await createReactProject(settings);
+
+  // Entring to the project directory
+  await enterProjectDir(settings);
+
+  // Parse and install style option
+  await parseStylingOption(settings);
+    
+  consola.box('Run the project with: npm run dev');
 };
