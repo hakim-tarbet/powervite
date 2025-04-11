@@ -4,18 +4,39 @@ import prompts from 'prompts';
 jest.mock('prompts');
 
 describe('CLI Prompts should', () => {
-  const promptsMock = prompts as jest.Mock;
-
   afterEach(() => {
-    promptsMock.mockClear();
+    jest.clearAllMocks();
   });
 
-  test('should ask the user if they want to use TypeScript', async () => {
-    promptsMock.mockResolvedValue({ useTypescript: true });
+  test('ask the user if want to use TypeScript or not', async () => {
+    const response = await askUserChoices();
 
-    const answers = await askUserChoices();
+    expect(prompts).toHaveBeenCalledWith({
+      type: 'confirm',
+      name: 'useTypescript',
+      message: 'Do you want to use TypeScript?',
+      initial: true,
+    });
+  });
 
-    expect(promptsMock).toHaveBeenCalledTimes(1);
-    expect(answers.useTypescript).toBe(true);
+  test('ask the user about the styling options', async () => {
+    const response = await askUserChoices();
+
+    expect(prompts).toHaveBeenCalledWith({
+      type: 'select',
+      name: 'style',
+      message: 'Choose a styling and/or theme option:',
+      choices: [
+        {title: 'None (Plain CSS)', value: 'none'},
+        {title: 'SCSS / Sass', value: 'scss'},
+        {title: 'Styled Components', value: 'styled-components'},
+        {title: 'Tailwind CSS', value: 'tailwind'},
+        {title: 'Bootstrap UI', value: 'bootstrap'},
+        {title: 'Material UI', value: 'material-ui'},
+        {title: 'Chakra UI', value: 'chakra-ui'},
+        {title: 'Ant Design', value: 'ant-design'},
+      ],
+      initial: 0
+    });
   });
 });
