@@ -50,6 +50,31 @@ describe('CLI Prompts should', () => {
             {"title": "Chakra UI", "value": "chakra-ui"},
             {"title": "Ant Design", "value": "ant-design"}
           ],
+          initial: 0,
+        }),
+      ]),
+      expect.objectContaining({ onCancel: expect.any(Function) })
+    );
+  });
+
+  test('ask the user about linting option', async () => {
+    promptsMock.mockResolvedValueOnce({ linting: 'eslint-prettier' });
+
+    await promptProjectOptions(onCancelMock);
+
+    expect(promptsMock).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'select',
+          name: 'style',
+          message: 'Choose the lint and prettier option:',
+          choices: [
+            {"title": "None", "value": "none"},
+            {"title": "Only ESLint", "value": "eslint"},
+            {"title": "Only Prettier", "value": "prettier"},
+            {"title": "ESLint + Prettier", "value": "eslint-prettier"},
+          ],
+          initial: 0,
         }),
       ]),
       expect.objectContaining({ onCancel: expect.any(Function) })
