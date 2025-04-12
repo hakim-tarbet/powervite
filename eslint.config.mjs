@@ -5,8 +5,10 @@ import prettierConfig from './.prettierrc.cjs';
 
 export default [
   {
+    ignores: ['node_modules/**', 'dist/**', 'coverage/**'],
+  },
+  {
     files: ['src/**/*.ts', 'tests/**/*.ts'],
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
     languageOptions: {
       parser,
       parserOptions: {
