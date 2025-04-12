@@ -76,6 +76,7 @@ const parseStylingOption = async (settings: ProjectSettings) => {
 
   try {
     await installAndConfigureStyles(settings.style);
+    spinner.succeed('Styles insalled successfully');
   } catch (error) {
     spinner.fail('Styling instalation failed. Please try again.');
     consola.error(error);
