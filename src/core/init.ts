@@ -12,7 +12,6 @@ interface ProjectSettings {
   style: string;
 }
 
-
 /**
  * Prompts the user for project settings and determines the chosen template.
  * Uses a default project name if none is provided.
@@ -41,16 +40,12 @@ const getInitProjectSettings = async (name?: string): Promise<ProjectSettings> =
  * @param settings - The configuration settings for the project.
  */
 const createReactProject = async (settings: ProjectSettings): Promise<void> => {
-  const spinner = ora(
-    `Setting up a React project with ${settings.language} in '${settings.projectName}'`
-  ).start();
+  const spinner = ora(`Setting up a React project with ${settings.language} in '${settings.projectName}'`).start();
 
   try {
-    await execa(
-      'npm',
-      ['create', 'vite@latest', settings.projectName, '--', '--template', settings.template],
-      { stdio: 'ignore' }
-    );
+    await execa('npm', ['create', 'vite@latest', settings.projectName, '--', '--template', settings.template], {
+      stdio: 'ignore',
+    });
     spinner.succeed('Project created successfully!');
   } catch (error) {
     spinner.fail('Project creation failed. Please try again.');
@@ -83,7 +78,6 @@ const parseStylingOption = async (settings: ProjectSettings) => {
   }
 };
 
-
 /**
  * Initializes the project setup by first getting the project settings and then
  * creating the React project.
@@ -104,6 +98,6 @@ export const initProject = async (name?: string): Promise<void> => {
 
   // Parse and install style option
   await parseStylingOption(settings);
-    
+
   consola.box('Run the project with: npm run dev');
 };

@@ -6,7 +6,7 @@ import { questions } from './questions';
  *
  * This function uses the `prompts` package to ask the user a set of
  * questions defined in the imported `questions` module.
- * 
+ *
  * If the user cancels any prompt, the provided onCancel callback is
  * invoked to handle the cancellation, and the prompt session is terminated.
  *

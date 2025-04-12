@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable indent */
 
 import { initProject } from '@core/init';
 import { consola } from 'consola';

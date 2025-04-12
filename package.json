@@ -24,22 +24,23 @@
     "@types/inquirer": "^9.0.7",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.9.1",
-    "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "@typescript-eslint/parser": "^8.15.0",
-    "eslint": "^9.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
     "eslint-import-resolver-typescript": "^4.3.2",
+    "eslint-plugin-prettier": "^5.2.6",
     "jest": "^29.7.0",
+    "prettier": "^3.5.3",
     "ts-jest": "^29.2.5"
   },
   "scripts": {
-    "build": "npx tsc",
-    "chmod-exec": "chmod +x dist/index.js",
-    "prepare": "npm run  build && npm run chmod-exec",
-    "start": "node dist/index.js",
     "dev": "node --no-warnings --loader @esbuild-kit/esm-loader src/index.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
     "test": "jest",
+    "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   }
 }
