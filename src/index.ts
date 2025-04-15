@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable indent */
 
 import { initProject } from '@core/init';
 import { consola } from 'consola';
@@ -26,6 +25,7 @@ export const Powervite = async (): Promise<void> => {
     case 'init':
       await initProject(projectName);
       break;
+
     default:
       consola.error('Command not valid');
       break;

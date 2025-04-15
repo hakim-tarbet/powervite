@@ -18,3 +18,7 @@ export const printBanner = (): void => {
   consola.log(bannerText);
   consola.log('Lets bootstrap your project!');
 };
+
+export const printSection = (title: string): void => {
+  consola.log('\n\n' + title + '\n');
+};

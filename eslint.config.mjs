@@ -24,7 +24,7 @@ export default [
       ...pluginTs.configs.recommended.rules,
       'prettier/prettier': ['error', prettierConfig],
       quotes: ['error', 'single'],
-      indent: ['error', 2],
+      indent: ['error', 2, { SwitchCase: 1 }],
     },
   },
 ];

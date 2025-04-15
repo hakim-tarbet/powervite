@@ -1,16 +1,10 @@
 import { execa } from 'execa';
 import ora from 'ora';
 import { consola } from 'consola';
-import { printBanner } from '@utils/banner';
+import { printBanner, printSection } from '@utils/banner';
 import { promptProjectOptions } from '@cli/prompts';
-import { installAndConfigureStyles } from '@features/styling';
-
-interface ProjectSettings {
-  projectName: string;
-  template: string;
-  language: string;
-  style: string;
-}
+import { installAndConfigureStyles } from '@features/styling/styling';
+import { ProjectSettings } from 'src/interfaces';
 
 /**
  * Prompts the user for project settings and determines the chosen template.
@@ -61,23 +55,6 @@ const enterProjectDir = async (settings: ProjectSettings) => {
   }
 };
 
-const parseStylingOption = async (settings: ProjectSettings) => {
-  const spinner = ora('Installing and configuring styling option').start();
-
-  if (settings.style === 'none') {
-    spinner.succeed('Skipped styling option instalation');
-    return;
-  }
-
-  try {
-    await installAndConfigureStyles(settings.style);
-    spinner.succeed('Styles insalled successfully');
-  } catch (error) {
-    spinner.fail('Styling instalation failed. Please try again.');
-    consola.error(error);
-  }
-};
-
 /**
  * Initializes the project setup by first getting the project settings and then
  * creating the React project.
@@ -88,16 +65,18 @@ export const initProject = async (name?: string): Promise<void> => {
   printBanner();
 
   // Get init project settings from user.
+  printSection(' Define your project settings:');
   const settings = await getInitProjectSettings(name);
 
   // Create the project using the collected settings.
+  printSection('Setting up your project:');
   await createReactProject(settings);
 
   // Entring to the project directory
   await enterProjectDir(settings);
 
   // Parse and install style option
-  await parseStylingOption(settings);
+  await installAndConfigureStyles(settings);
 
   consola.box('Run the project with: npm run dev');
 };

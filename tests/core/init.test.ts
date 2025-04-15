@@ -1,7 +1,7 @@
 import { promptProjectOptions } from '@cli/prompts';
 import { initProject } from '@core/init';
 import { printBanner } from '@utils/banner';
-import { installAndConfigureStyles } from '@features/styling';
+import * as stylingModule from '@features/styling/styling';
 import { consola } from 'consola';
 import { execa } from 'execa';
 import ora from 'ora';
@@ -36,9 +36,10 @@ jest.mock('@cli/prompts', () => ({
 
 jest.mock('@utils/banner', () => ({
   printBanner: jest.fn().mockResolvedValue(undefined),
+  printSection: jest.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('@features/styling', () => ({
+jest.mock('@features/styling/styling', () => ({
   installAndConfigureStyles: jest.fn().mockResolvedValue(undefined),
 }));
 
@@ -143,20 +144,6 @@ describe('Vite init project should', () => {
     exitSpy.mockRestore();
   });
 
-  test('not install styles selected option by user is None', async () => {
-    (promptProjectOptions as jest.Mock).mockResolvedValue({
-      useTypescript: false,
-      style: 'none',
-    });
-
-    await initProject();
-
-    const spinnerMock = getMockedOraSpinner(1);
-
-    expect(spinnerMock.succeed).toHaveBeenCalledWith('Skipped styling option instalation');
-    expect(installAndConfigureStyles).not.toHaveBeenCalled();
-  });
-
   test('install the selected style by user', async () => {
     (promptProjectOptions as jest.Mock).mockResolvedValue({
       useTypescript: false,
@@ -165,17 +152,11 @@ describe('Vite init project should', () => {
 
     await initProject();
 
-    expect(installAndConfigureStyles).toHaveBeenCalledWith('mui');
-  });
-
-  test('throw an error if styling insalation fails', async () => {
-    (installAndConfigureStyles as jest.Mock).mockRejectedValue(new Error('Failed'));
-
-    await initProject('test-project');
-
-    const spinnerMock = getMockedOraSpinner(1);
-
-    expect(spinnerMock.fail).toHaveBeenCalledWith('Styling instalation failed. Please try again.');
-    expect(consola.error).toHaveBeenCalledWith(expect.any(Error));
+    expect(stylingModule.installAndConfigureStyles).toHaveBeenCalledWith({
+      language: 'JavaScript',
+      projectName: 'my-app',
+      style: 'mui',
+      template: 'react',
+    });
   });
 });
